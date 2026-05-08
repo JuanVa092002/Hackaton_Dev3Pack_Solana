@@ -1,0 +1,28 @@
+---
+description: Product guardrails for Trustbound Airbag
+alwaysApply: true
+---
+
+# Trustbound Product Guardrails
+
+**North star**
+
+The core loop drives every decision: Intent → Risk Analysis → Alert → Decision → Containment.
+
+**Scope test (use before implementing)**
+
+- Does this change make the **demo flow** clearer or safer on mobile?
+- If no, stop and ask — do not expand scope.
+
+**Explicit non-goals**
+
+Not a full wallet, not a complex dashboard, not an analytics platform, not an enterprise policy system, not a social product.
+
+**Experience**
+
+- Mobile-first. Telegram Mini App and mobile browser are **one** UX surface; no separate “desktop product” before the core flow ships.
+- Visible protection beats invisible complexity. One polished path beats many half-built features.
+
+**Source of truth**
+
+Hackathon boundaries: `docs/context/mvp-scope.md`.
