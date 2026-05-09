@@ -1,61 +1,97 @@
 import time
-
-# Matrix
-RISK_WEIGHTS = {
-    "new_address": 7,
-    "speed": 3,
-    "honeypot_trigger": 40,
-    "unknown_reputation": 10,
-    "suspicious_mint": 15,
-    "unlocked_lp": 25
-}
+import random
 
 def calculate_risk_score(wallet_data: dict, contract_data: dict = None):
-    """
-    Motor de decisión del Airbag Protocol.
-    Procesa datos crudos y devuelve el score y veredicto.
-    """
     score = 0
     alerts = []
     is_honeypot = False
+    critical_terms = ["freeze authority", "transfer hook", "simulation", "mint authority", "rugged"]
+    highest_detected_level = None
 
-    # --- 1. Identity Logic ---
+    if not isinstance(wallet_data, dict):
+        wallet_data = {}
+
+    # --- 1. WALLET EVALUATION ---
     if wallet_data.get("is_new"):
-        score += RISK_WEIGHTS["new_address"]
-        alerts.append("Section 1: New Address (<24h)")
-    
+        highest_detected_level = "warn"
+
     if wallet_data.get("tx_count", 0) > 15:
-        score += RISK_WEIGHTS["speed"]
-        alerts.append("Section 2: High Transaction speed")
+        if highest_detected_level is None:
+            highest_detected_level = "good"
 
-    # --- 2. Contract Logic ---
-    if contract_data:
-        rc_score = contract_data.get("score", 0)
-        
-        if rc_score > 500:
-            score += RISK_WEIGHTS["suspicious_mint"]
-            alerts.append("Section 3: Suspicious Mint Reputation")
+    # --- 2. CONTRACT EVALUATION ---
+    if contract_data and isinstance(contract_data, dict):
 
-        # Risk liquidez
-        markets = contract_data.get("markets", [])
-        lp_locked = any(m.get("lp", {}).get("lpLocked", 0) > 0 for m in markets)
+        # A. Score threshold → warn
+        if contract_data.get("score", 0) > 500:
+            if highest_detected_level != "danger":
+                highest_detected_level = "warn"
+
+        # B. LP locked check → danger if not locked
+        markets = contract_data.get("markets") or []
+        lp_locked = any(
+            isinstance(m, dict) and m.get("lp", {}).get("lpLocked", 0) > 0
+            for m in markets
+        )
         if not lp_locked:
-            score += RISK_WEIGHTS["unlocked_lp"]
-            alerts.append("CRITICAL: LP 100% Unlocked")
+            highest_detected_level = "danger"
 
-        # Technical Risks (Honeypot)
-        risks = contract_data.get("risks", [])
-        for risk in risks:
-            name = risk.get("name", "")
-            if any(x in name for x in ["Freeze Authority", "Transfer Hook", "Simulation", "Mint Authority"]):
-                is_honeypot = True
-                score += RISK_WEIGHTS["honeypot_trigger"]
-                alerts.append(f"Honeypot Trigger: {name}")
+    # C. Risks list processing FIRST
+        risks_list = contract_data.get("risks") or []
 
-    # --- 3. Trafic Light ---
+        if isinstance(risks_list, list):
+            if len(risks_list) == 0:
+                # Empty risks [] → explicitly Good
+                highest_detected_level = "good"  # ← Remove the None guard here
+            else:
+                for risk in risks_list:
+                    if not isinstance(risk, dict):
+                        continue
+
+                    risk_name = risk.get("name", "")
+                    if risk_name:
+                        alerts.append(risk_name)
+
+                    level = str(risk.get("level", "")).lower()
+                    name_lower = risk_name.lower()
+
+                    if any(term in name_lower for term in critical_terms):
+                        is_honeypot = True
+                        highest_detected_level = "danger"
+
+                    if level == "danger":
+                        highest_detected_level = "danger"
+                    elif level == "warn" and highest_detected_level != "danger":
+                        highest_detected_level = "warn"
+                    elif level == "good" and highest_detected_level is None:
+                        highest_detected_level = "good"
+
+        # A. Score threshold → warn (only if risks didn't resolve level)
+        if contract_data.get("score", 0) > 500:
+            if highest_detected_level not in ("danger", "good"):
+                highest_detected_level = "warn"
+
+        # B. LP locked check → danger only if risks were empty or non-danger
+        markets = contract_data.get("markets") or []
+        lp_locked = any(
+            isinstance(m, dict) and m.get("lp", {}).get("lpLocked", 0) > 0
+            for m in markets
+        )
+        if not lp_locked and highest_detected_level != "good":
+            highest_detected_level = "danger"
+
+    # --- 3. SCORE BY RANGE ---
+    if highest_detected_level == "danger":
+        score = random.randint(50, 100)
+    elif highest_detected_level == "warn":
+        score = random.randint(20, 49)
+    else:
+        score = random.randint(1, 19)
+
+    # --- 4. VERDICT ---
     if score >= 50:
         verdict, semaphore = "AIRBAG_INTERCEPTION", "RED"
-    elif score >= 20 or is_honeypot: 
+    elif score >= 20:
         verdict, semaphore = "WARN_USER_VOICE", "YELLOW"
     else:
         verdict, semaphore = "ALLOW", "GREEN"
@@ -64,5 +100,9 @@ def calculate_risk_score(wallet_data: dict, contract_data: dict = None):
         "score": score,
         "semaphore": semaphore,
         "verdict": verdict,
-        "details": {"honeypot_logic": is_honeypot, "alerts": list(set(alerts))}
+        "details": {
+            "level": highest_detected_level,
+            "honeypot_logic": is_honeypot,
+            "alerts": list(set(alerts))
+        }
     }
