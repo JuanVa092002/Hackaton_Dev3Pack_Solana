@@ -4,6 +4,7 @@ import asyncio
 import httpx
 from fastapi import FastAPI, Request
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 # calculate_risk_score import 
 from apps.backend.app import calculate_risk_score
@@ -15,6 +16,25 @@ app = FastAPI(title="TrustBond Airbag Engine")
 API_KEY = os.getenv("API_KEY")
 HELIUS_URL = f"https://mainnet.helius-rpc.com/?api-key={API_KEY}"
 RUGCHECK_URL = "https://api.rugcheck.xyz/v1/tokens/{}/report"
+
+# CORS configuration
+# Read comma-separated origins from CORS_ALLOWED_ORIGINS.
+# In production set to the Vercel domain (e.g. https://hackaton-dev3-pack-solana.vercel.app).
+# If empty, defaults to ["*"] which is allowed for local development only.
+cors_allowed = os.getenv("CORS_ALLOWED_ORIGINS", "")
+if cors_allowed:
+    origins = [o.strip() for o in cors_allowed.split(",") if o.strip()]
+else:
+    # WARNING: wildcard is intended only for local development/testing.
+    origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 async def fetch_helius_data(address: str, client: httpx.AsyncClient):
     payload = {
