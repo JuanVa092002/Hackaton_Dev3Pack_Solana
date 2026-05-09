@@ -2,11 +2,12 @@ import time
 
 # Matrix
 RISK_WEIGHTS = {
-    "new_address": 12,
-    "velocity": 5,
-    "honeypot_trigger": 30,
-    "suspicious_mint": 20,
-    "unlocked_lp": 15
+    "new_address": 7,
+    "speed": 3,
+    "honeypot_trigger": 40,
+    "unknown_reputation": 10,
+    "suspicious_mint": 15,
+    "unlocked_lp": 25
 }
 
 def calculate_risk_score(wallet_data: dict, contract_data: dict = None):
@@ -24,8 +25,8 @@ def calculate_risk_score(wallet_data: dict, contract_data: dict = None):
         alerts.append("Section 1: New Address (<24h)")
     
     if wallet_data.get("tx_count", 0) > 15:
-        score += RISK_WEIGHTS["velocity"]
-        alerts.append("Section 2: High Transaction Velocity")
+        score += RISK_WEIGHTS["speed"]
+        alerts.append("Section 2: High Transaction speed")
 
     # --- 2. Contract Logic ---
     if contract_data:
