@@ -4,5 +4,8 @@
   "outputDirectory": "apps/web/.next",
   "installCommand": "cd apps/web && npm install",
   "framework": "nextjs",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/web/"
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/web/",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://hackaton-dev3pack-solana.onrender.com"
+  }
 }
