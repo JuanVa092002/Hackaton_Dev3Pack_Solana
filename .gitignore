@@ -1,0 +1,63 @@
+# dependencies (monorepo-wide)
+**/node_modules/
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing / coverage
+/coverage
+**/coverage/
+
+# next.js — root or nested app
+/.next/
+/out/
+apps/web/.next/
+apps/web/out/
+apps/web/.turbo/
+
+# production build outputs
+/build
+**/dist/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files (keep .env.example committed)
+.env*.local
+.env
+
+# vercel
+.vercel
+apps/web/.vercel
+
+# typescript build info
+*.tsbuildinfo
+
+# Python (apps/backend and any future tooling)
+apps/backend/**/__pycache__/
+apps/backend/**/*.py[cod]
+apps/backend/**/.pytest_cache/
+apps/backend/**/.mypy_cache/
+apps/backend/.venv/
+apps/backend/venv/
+apps/backend/**/*.egg-info/
+apps/__pycache__/
+oracle/__pycache__/
+
+# Rust / Solana program build (Anchor uses target/)
+/target/
+programs/trustbond-airbag/target/
+programs/airbag-logic/target/
+
+# Anchor
+.anchor
+test-ledger
+.surfpool
+**/*.rs.bk
+.yarn

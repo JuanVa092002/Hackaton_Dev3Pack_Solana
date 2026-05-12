@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    @apply bg-zinc-950 text-zinc-50;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent bounce scroll on iOS / Telegram Mini App */
+    overscroll-behavior: none;
+  }
+
+  /* Safe-area custom property — used by pb-safe utility below */
+  :root {
+    --sab: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Respect reduced motion for all custom animations */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Bottom padding that respects iPhone home indicator and Telegram Mini App insets */
+  .pb-safe {
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  }
+}

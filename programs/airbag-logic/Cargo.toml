@@ -1,0 +1,16 @@
+[package]
+name = "airbag-logic"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+anchor-lang.workspace = true
+serde.workspace = true
+trustbond-airbag = { path = "../trustbond-airbag", features = ["cpi"]}
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[features]
+idl-build = ["anchor-lang/idl-build"]

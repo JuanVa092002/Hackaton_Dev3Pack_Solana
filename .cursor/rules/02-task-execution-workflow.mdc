@@ -1,0 +1,28 @@
+---
+description: Batch-based task workflow for non-trivial work
+alwaysApply: true
+---
+
+# Task Execution Workflow
+
+**When this applies**
+
+Use for any task that is not a one-line fix: multiple files, new structure, dependency or config changes, or any product-behavior change.
+
+**Sequence**
+
+1. Understand — restate goal and constraints in your own words.
+2. Inspect — open the relevant files; do not invent file layout or APIs.
+3. Plan — smallest batch that delivers one clear outcome.
+4. Approve — if the batch changes scope, structure, or product behavior, get explicit user approval first.
+5. Execute — only what was approved.
+6. Validate — lightest reliable check available in the repo.
+7. Report — then stop. Do not start the next batch without approval.
+
+**End-of-batch report (required)**
+
+- Files touched (created/modified/deleted).
+- One line per file: what changed.
+- Validation run (or “none — docs only”).
+- Open risks.
+- Recommended next batch (single suggestion).

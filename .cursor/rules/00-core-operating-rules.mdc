@@ -1,0 +1,26 @@
+---
+description: Core operating rules for agents working in this repository
+alwaysApply: true
+---
+
+# Core Operating Rules
+
+**Before editing**
+
+- Read the smallest set of files needed. Prefer `docs/context/` and `docs/operations/handoff.md` over guessing.
+- Do not assume runtime behavior, APIs, or user flows that are not in repo or verified by inspection.
+
+**While editing**
+
+- Prefer small, reviewable diffs. One concern per batch when possible.
+- Preserve existing behavior unless a change clearly improves operability and is approved when it affects scope or structure.
+- Do not copy large blocks between rules, steering, and docs — link to the single source instead.
+
+**After editing**
+
+- Run the lightest check that fits the change (lint, typecheck, or manual sanity) when those tools exist.
+- Do not add product code, app scaffolding, dependencies, or new architecture before an approved implementation batch.
+
+**History**
+
+- Keep session noise out of stable docs. Put compressed history only in `docs/archive/` when needed.
